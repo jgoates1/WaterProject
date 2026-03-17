@@ -14,9 +14,19 @@ namespace WaterProject.API.Controllers
         }
         
         [HttpGet("AllProjects")]
-        public IEnumerable<Project> Get()
+        public IActionResult Get(int pageSize = 10, int pageNum = 1)
         {
-            return _waterContext.Projects.ToList();
+            var something = _waterContext.Projects
+                .Skip(pageSize * (pageNum - 1))
+                .Take(pageSize)
+                .ToList();
+            var totalNumProjects = _waterContext.Projects.Count();
+            
+            return Ok(new
+            {
+                Projects = something,
+                totalNumProjects = totalNumProjects
+            });
         }
     }
 }
