@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import type { Project } from './types/Project'
+import type { Project } from '../types/Project'
+import { useNavigate } from "react-router-dom";
 
 function ProjectList({selectedCategories} : {selectedCategories: string[]}) {
 
@@ -10,6 +11,8 @@ function ProjectList({selectedCategories} : {selectedCategories: string[]}) {
     const [pageNum, setPageNum] = useState<number>(1);
 
     const [totalPages, setTotalPages] = useState<number>(0);
+
+    const navigate = useNavigate();
 
 
     useEffect(() => {
@@ -38,6 +41,8 @@ function ProjectList({selectedCategories} : {selectedCategories: string[]}) {
                         <li><strong>Project Phase: </strong>{p.projectPhase}</li>
                         <li><strong>Project Status: </strong>{p.projectFunctionalityStatus}</li>
                     </ul>
+
+                    <button className="btn btn-success" onClick={() => navigate(`/donate/${p.projectName}/${p.projectId}`)}>Donate</button>
                     </div>
                 </div>)}
 
