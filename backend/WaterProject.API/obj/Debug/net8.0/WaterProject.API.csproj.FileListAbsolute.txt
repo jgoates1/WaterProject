@@ -250,3 +250,4 @@
 /Users/joshuagoates/Documents/WaterProject/backend/WaterProject.API/obj/Debug/net8.0/staticwebassets/msbuild.buildTransitive.WaterProject.API.props
 /Users/joshuagoates/Documents/WaterProject/backend/WaterProject.API/obj/Debug/net8.0/staticwebassets.pack.json
 /Users/joshuagoates/Documents/WaterProject/backend/WaterProject.API/obj/Debug/net8.0/WaterProject.API.csproj.CopyComplete
+/Users/joshuagoates/Documents/WaterProject/backend/WaterProject.API/obj/Debug/net8.0/WaterProject.API.sourcelink.json
