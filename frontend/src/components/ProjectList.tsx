@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import type { Project } from '../types/Project'
 import { useNavigate } from "react-router-dom";
+import { fetchProjects } from "../api/ProjectsAPI";
+import Pagination from "./Pagination";
 
 function ProjectList({selectedCategories} : {selectedCategories: string[]}) {
 
@@ -14,17 +16,29 @@ function ProjectList({selectedCategories} : {selectedCategories: string[]}) {
 
     const navigate = useNavigate();
 
+    const [error, setError] = useState<string | null>(null);
+    const [loading, setLoading] = useState(true);
+
 
     useEffect(() => {
-        const fetchProjects = async () => {
-            const categoryParams = selectedCategories.map((cat) => `projectTypes=${encodeURIComponent(cat)}`).join('&');
-            const response = await fetch(`https://localhost:5000/water/allprojects?pageSize=${pageSize}&pageNum=${pageNum}${selectedCategories.length ? `&${categoryParams}` : ''}`);
-            const data = await response.json()
+        const loadProjects = async () => {
+            try {
+                setLoading(true);
+                const data = await fetchProjects(pageSize, pageNum, selectedCategories)
+            
             setProjects(data.projects);
             setTotalPages(Math.ceil(data.totalNumProjects / pageSize));
+            } catch (error) {
+                setError((error as Error).message);
+            } finally {
+                setLoading(false);
+            }
         };
-        fetchProjects();
+        loadProjects();
     }, [pageSize, pageNum, selectedCategories]);
+
+    if (loading) return <p>Loading Projects...</p>
+    if (error) return <p className='text-red-500'>Error: {error}</p>
 
     return (
         <>
@@ -44,52 +58,22 @@ function ProjectList({selectedCategories} : {selectedCategories: string[]}) {
 
                     <button className="btn btn-success" onClick={() => navigate(`/donate/${p.projectName}/${p.projectId}`)}>Donate</button>
                     </div>
+
                 </div>)}
 
-            <div className="mt-3 d-flex flex-column align-items-center gap-3">
-                <div className="d-flex flex-wrap justify-content-center align-items-center gap-2">
-                    <button
-                        type="button"
-                        className="btn btn-outline-secondary btn-sm"
-                        onClick={() => setPageNum(pageNum - 1)}
-                        disabled={pageNum <= 1}
-                    >
-                        Previous
-                    </button>
-                    {[...Array(totalPages)].map((_, index) => (
-                        <button
-                            key={index + 1}
-                            type="button"
-                            className="btn btn-outline-secondary btn-sm"
-                            onClick={() => setPageNum(index + 1)}
-                            disabled={pageNum === index + 1}
-                        >
-                            {index + 1}
-                        </button>
-                    ))}
-                    <button
-                        type="button"
-                        className="btn btn-outline-secondary btn-sm"
-                        onClick={() => setPageNum(pageNum + 1)}
-                        disabled={pageNum >= totalPages || totalPages === 0}
-                    >
-                        Next
-                    </button>
-                </div>
-                <label>
-                    Results per page:
-                    <select
-                        className="form-select form-select-sm d-inline-block ms-2"
-                        style={{ width: "auto", verticalAlign: "middle" }}
-                        value={pageSize}
-                        onChange={(p) => {setPageSize(Number(p.target.value)); setPageNum(1);}}
-                    >
-                        <option value="5">5</option>
-                        <option value="10">10</option>
-                        <option value="20">20</option>
-                    </select>
-                </label>
-            </div>
+
+                <Pagination 
+                        currentPage={pageNum}
+                        totalPages={totalPages}
+                        pageSize={pageSize}
+                        onPageChange={setPageNum}
+                        onPageSizeChange={(newSize) => {
+                            setPageSize(newSize);
+                            setPageNum(1);
+                        }}
+                    />
+
+        
         </>
     );
 }
